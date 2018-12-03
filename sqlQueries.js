@@ -13,7 +13,11 @@ const queries = {
                             WHERE {foreignKey} = {table}.{primaryKey}`,
 
     findAll :              `SELECT * 
-                            FROM {table}`
+                            FROM {table}`,
+
+    delete :               `DELETE 
+                            FROM {table}
+                            WHERE id = {id}`
 };
 
 function getQueryFind(obj) {
@@ -45,7 +49,18 @@ function getQueryFindWithRelation(obj) {
         .replace(/{primaryKey}/g, obj.primaryKey);
 }
 
+function deleteItem(obj) {
+    if (Number.isInteger(Number(obj.id))) {
+        return queries['delete']
+            .replace(/{table}/g, obj.table)
+            .replace(/{id}/g, obj.id);
+    }
+
+    throw new Error('Invalid id');
+}
+
 module.exports = {
     getQueryFind,
-    getQueryFindWithRelation
+    getQueryFindWithRelation,
+    deleteItem
 };

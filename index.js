@@ -34,7 +34,10 @@ db.connect(function(err) {
   // console.log(car1);
 
   const users = await user.loadAll();
-  console.log(users);
+  // console.log(users);
+
+  // const deletingResult = await user.delete(2);
+  // console.log(deletingResult);
 
 })();
 

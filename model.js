@@ -1,5 +1,6 @@
 const { getQueryFind,
-        getQueryFindWithRelation} = require('./sqlQueries');
+        getQueryFindWithRelation,
+        deleteItem } = require('./sqlQueries');
 
 class Model {
 
@@ -40,6 +41,18 @@ class Model {
 
     async loadAll() {
         return await this.find()
+    }
+
+    async delete(id) {
+        try {
+            return (await db.query(deleteItem({
+                table: this.constructor.table(),
+                id
+            })))
+        } catch (err) {
+            console.error(err)
+        }
+
     }
 }
 
