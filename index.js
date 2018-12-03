@@ -27,11 +27,14 @@ db.connect(function(err) {
 
   const user = new User();
   const user1 = await user.load(2);
-  console.log(user1);
+  // console.log(user1);
 
   const car = new Car();
   const car1 = await car.load(2);
-  console.log(car1);
+  // console.log(car1);
+
+  const users = await user.loadAll();
+  console.log(users);
 
 })();
 
