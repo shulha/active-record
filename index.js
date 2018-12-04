@@ -24,21 +24,24 @@ db.connect(function(err) {
 });
 
 (async function() {
+  try {
+      const user = new User();
+      const user1 = await user.load(2);
+      // console.log(user1);
 
-  const user = new User();
-  const user1 = await user.load(2);
-  // console.log(user1);
+      const car = new Car();
+      const car1 = await car.load(2);
+      // console.log(car1);
 
-  const car = new Car();
-  const car1 = await car.load(2);
-  // console.log(car1);
+      const users = await user.loadAll();
+      // console.log(users);
 
-  const users = await user.loadAll();
-  // console.log(users);
+      // const deletingResult = await user.delete(2);
+      // console.log(deletingResult);
 
-  // const deletingResult = await user.delete(2);
-  // console.log(deletingResult);
-
+  } catch (err) {
+      console.error(err)
+  }
 })();
 
 // Открыть с БД и вывести в консоль сузествующего пользователя с машинами

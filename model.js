@@ -16,7 +16,7 @@ class Model {
 
                     result.push(await db.query(getQueryFindWithRelation({
                         table: this.constructor.table(),
-                        model,
+                        model: model.table(),
                         foreignKey,
                         primaryKey,
                         id
@@ -44,15 +44,14 @@ class Model {
     }
 
     async delete(id) {
-        try {
-            return (await db.query(deleteItem({
-                table: this.constructor.table(),
-                id
-            })))
-        } catch (err) {
-            console.error(err)
+        if (!Number.isInteger(Number(id))) {
+            throw new Error('Invalid id');
         }
 
+        return (await db.query(deleteItem({
+            table: this.constructor.table(),
+            id
+        })));
     }
 }
 

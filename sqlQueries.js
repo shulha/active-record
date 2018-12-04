@@ -36,7 +36,7 @@ function getQueryFindWithRelation(obj) {
     if (obj.id) {
         return queries['findByIdWithRelation']
             .replace(/{table}/g, obj.table)
-            .replace(/{model}/g, obj.model.table())
+            .replace(/{model}/g, obj.model)
             .replace(/{foreignKey}/g, obj.foreignKey)
             .replace(/{primaryKey}/g, obj.primaryKey)
             .replace(/{id}/g, obj.id);
@@ -44,19 +44,15 @@ function getQueryFindWithRelation(obj) {
 
     return queries['findAllWithRelation']
         .replace(/{table}/g, obj.table)
-        .replace(/{model}/g, obj.model.table())
+        .replace(/{model}/g, obj.model)
         .replace(/{foreignKey}/g, obj.foreignKey)
         .replace(/{primaryKey}/g, obj.primaryKey);
 }
 
 function deleteItem(obj) {
-    if (Number.isInteger(Number(obj.id))) {
-        return queries['delete']
-            .replace(/{table}/g, obj.table)
-            .replace(/{id}/g, obj.id);
-    }
-
-    throw new Error('Invalid id');
+    return queries['delete']
+        .replace(/{table}/g, obj.table)
+        .replace(/{id}/g, obj.id);
 }
 
 module.exports = {
