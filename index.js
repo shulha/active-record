@@ -25,19 +25,41 @@ db.connect(function(err) {
 
 (async function() {
   try {
-      const user = new User();
-      const user1 = await user.load(2);
-      // console.log(user1);
+      // const user = new User();
+      // const user1 = await user.load(2);
+      // // console.log(user1);
+      //
+      // const car = new Car();
+      // const car1 = await car.load(2);
+      // // console.log(car1);
+      //
+      // const users = await user.loadAll();
+      // // console.log(users);
+      //
+      // // const deletingResult = await user.delete(2);
+      // // console.log(deletingResult);
 
-      const car = new Car();
-      const car1 = await car.load(2);
-      // console.log(car1);
+      const car1 = new Car();
+      car1.model = 'first';
+      car1.year  = 2012;
 
-      const users = await user.loadAll();
-      // console.log(users);
+      const car2 = new Car();
+      car2.model = 'second';
+      car2.year  = 3030;
 
-      // const deletingResult = await user.delete(2);
-      // console.log(deletingResult);
+      const newUser = new User();
+      // newUser.id         = 2;
+      newUser.first_name = 'lolo';
+      newUser.last_name  = 'LALALA';
+      newUser.age        = 22;
+      newUser.gender     = 'M';
+      newUser.cars       = [
+        car1,
+        car2
+      ];
+
+      const result = await newUser.save();
+      console.log(result);
 
   } catch (err) {
       console.error(err)

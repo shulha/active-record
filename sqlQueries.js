@@ -17,7 +17,13 @@ const queries = {
 
     delete :               `DELETE 
                             FROM {table}
-                            WHERE id = {id}`
+                            WHERE id = {id}`,
+
+    insert :               `INSERT INTO {table} SET ?`,
+
+    update :               `UPDATE {table} 
+                            SET {setString} 
+                            WHERE id = ?`
 };
 
 function getQueryFind(obj) {
@@ -55,8 +61,21 @@ function deleteItem(obj) {
         .replace(/{id}/g, obj.id);
 }
 
+function insertItem(obj) {
+    return queries['insert']
+        .replace(/{table}/g, obj.table);
+}
+
+function updateItem(obj) {
+    return queries['update']
+        .replace(/{table}/g, obj.table)
+        .replace(/{setString}/g, obj.setString);
+}
+
 module.exports = {
     getQueryFind,
     getQueryFindWithRelation,
-    deleteItem
+    deleteItem,
+    insertItem,
+    updateItem
 };
