@@ -14,4 +14,6 @@ class Car extends Model {
   }
 }
 
+Car.pk ='id' ;
+
 module.exports = Car;

@@ -22,4 +22,13 @@ class User extends Model {
   }
 }
 
+User.pk ='id' ;
+User.hasMany = [
+  {
+    model: Car,
+    primaryKey: 'id',
+    foreignKey: 'user_id'
+  }
+];
+
 module.exports = User;

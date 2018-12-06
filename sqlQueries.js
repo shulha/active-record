@@ -1,9 +1,4 @@
 const queries = {
-    findByIdWithRelation : `SELECT *
-                            FROM {table}, {model}
-                            WHERE {foreignKey} = {table}.{primaryKey}
-                            AND {table}.{primaryKey} = {id}`,
-
     findById :             `SELECT * 
                             FROM {table} 
                             WHERE {pk} = {id}`,
@@ -17,42 +12,36 @@ const queries = {
 
     delete :               `DELETE 
                             FROM {table}
-                            WHERE id = {id}`,
+                            WHERE id = {id}`, //todo в запросах захардкожен первичный ключ полем id
 
     insert :               `INSERT INTO {table} SET ?`,
 
     update :               `UPDATE {table} 
                             SET {setString} 
-                            WHERE id = ?`
+                            WHERE id = ?`, //todo в запросах захардкожен первичный ключ полем id
+
+    relation :             `SELECT *
+                            FROM {table}
+                            WHERE {foreignKey} = {id}`
 };
 
-function getQueryFind(obj) {
-    if (obj.id) {
+function withRelation({table, foreignKey, id}) {
+    return queries['relation']
+        .replace(/{table}/g, table)
+        .replace(/{foreignKey}/g, foreignKey)
+        .replace(/{id}/g, id);
+}
+
+function getQueryFind({table, pk, id}) {
+    if (id) {
         return queries['findById']
-            .replace(/{table}/g, obj.table)
-            .replace(/{pk}/g, obj.pk)
-            .replace(/{id}/g, obj.id);
+            .replace(/{table}/g, table)
+            .replace(/{pk}/g, pk)
+            .replace(/{id}/g, id);
     }
 
     return queries['findAll']
-        .replace(/{table}/g, obj.table);
-}
-
-function getQueryFindWithRelation(obj) {
-    if (obj.id) {
-        return queries['findByIdWithRelation']
-            .replace(/{table}/g, obj.table)
-            .replace(/{model}/g, obj.model)
-            .replace(/{foreignKey}/g, obj.foreignKey)
-            .replace(/{primaryKey}/g, obj.primaryKey)
-            .replace(/{id}/g, obj.id);
-    }
-
-    return queries['findAllWithRelation']
-        .replace(/{table}/g, obj.table)
-        .replace(/{model}/g, obj.model)
-        .replace(/{foreignKey}/g, obj.foreignKey)
-        .replace(/{primaryKey}/g, obj.primaryKey);
+        .replace(/{table}/g, table);
 }
 
 function deleteItem(obj) {
@@ -74,7 +63,7 @@ function updateItem(obj) {
 
 module.exports = {
     getQueryFind,
-    getQueryFindWithRelation,
+    withRelation,
     deleteItem,
     insertItem,
     updateItem

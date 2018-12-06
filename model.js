@@ -1,47 +1,56 @@
 const { getQueryFind,
-        getQueryFindWithRelation,
+        withRelation,
         deleteItem,
         insertItem,
         updateItem } = require('./sqlQueries');
 
 class Model {
 
-    async find (id = null) {
-        try {
-            const relations = this.hasMany;
+    static async find (id = null)
+    {
+        const arrayResult = [];
+
+        const queryResult = await db.query(getQueryFind({
+            table: this.table(),
+            pk: this.pk,
+            id
+        }));
+
+        const relations = this.hasMany;
+        for (let item of queryResult) {
+            let classObject = new this;
+            for (let field of classObject.fields) {
+                classObject[field] = item[field];
+            }
             if (relations) {
-                const result = [];
+                let relArr = [];
                 for (let i = 0; i < relations.length; i++) {
-                    const model = relations[i]['model'];
-                    const primaryKey = relations[i]['primaryKey'];
+                    const tableName = (relations[i]['model']).table();
                     const foreignKey = relations[i]['foreignKey'];
 
-                    result.push(await db.query(getQueryFindWithRelation({
-                        table: this.constructor.table(),
-                        model: model.table(),
-                        foreignKey,
-                        primaryKey,
-                        id
-                    })));
+                    const cars = await db.query(withRelation({
+                                    table: tableName,
+                                    foreignKey,
+                                    id: item.id
+                                }));
+                    relArr[tableName] = JSON.parse(JSON.stringify(cars));
                 }
-                return result;
-            } else {
-                return (await db.query(getQueryFind({
-                    table: this.constructor.table(),
-                    pk: this.pk,
-                    id
-                })));
+                classObject.relations = relArr;
             }
-        } catch (err) {
-            console.error(err)
+
+            arrayResult.push(classObject);
         }
+
+        return arrayResult;
     }
 
-    async load(id) {
-        return await this.find(id)
+    static async load(id)
+    {
+        return (await this.find(id)).shift()
     }
 
-    async loadAll() {
+    static async loadAll()
+    {
         return await this.find()
     }
 
