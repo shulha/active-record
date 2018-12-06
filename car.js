@@ -15,5 +15,6 @@ class Car extends Model {
 }
 
 Car.pk ='id' ;
+Car.fk ='user_id' ;
 
 module.exports = Car;

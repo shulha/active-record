@@ -2,7 +2,8 @@ const { getQueryFind,
         withRelation,
         deleteItem,
         insertItem,
-        updateItem } = require('./sqlQueries');
+        updateItem,
+        deleteRelation } = require('./sqlQueries');
 
 class Model {
 
@@ -64,69 +65,49 @@ class Model {
     }
 
     async save() {
-        const table      = this.constructor.table();
-        const id         = this.id;
-        const first_name = this.first_name;
-        const last_name  = this.last_name;
-        const age        = this.age;
-        const gender     = this.gender;
-        const cars       = this.cars;
-        let user_id,
-            resultUser,
-            resultCar = [];
+        const table = this.constructor.table();
+        const id    = this.id;
+        const data  = {};
 
-        if (!id) {
-            if (first_name && last_name && age && gender) {
-                const data = {
-                  first_name,
-                  last_name,
-                  age,
-                  gender
-                };
-                resultUser = await db.query(insertItem({table}), data);
-                user_id = resultUser.insertId;
-            } else
-                throw new Error('Empty column');
-        } else {
-            user_id = id;
-            let setString = '';
-            const data = [];
-            if (first_name) {
-              setString += 'first_name = ?, ';
-              data.push(first_name);
+        for (let field of this.fields) {
+            if (field !== 'id') {
+                data[field] = this[field];
             }
-            if (last_name) {
-              setString += 'last_name = ?, ';
-              data.push(last_name);
-            }
-            if (age) {
-              setString += 'age = ?, ';
-              data.push(age);
-            }
-            if (gender) {
-              setString += 'gender = ?, ';
-              data.push(gender);
-            }
-            data.push(id);
-            setString = setString.slice(0, -2);
-
-            resultUser = await db.query(updateItem({table, setString}), data);
         }
 
-        if (cars) {
-            for (let car of cars) {
-                const table = car.constructor.table();
-                const model = car.model;
-                const year  = car.year;
-                if (user_id && model && year) {
-                    const data = {
-                      user_id,
-                      model,
-                      year
-                    };
-                    resultCar.push(await db.query(insertItem({table}), data));
-                } else
-                    throw new Error('Empty column');
+        let resultUser, resultCar = [];
+
+        if (!id) {
+            resultUser = (await db.query(insertItem({table}), data));
+            this.id = resultUser.insertId;
+        } else {
+            resultUser = await db.query(updateItem({
+                table,
+                pk: this.pk,
+                id
+            }), data);
+        }
+
+        if (this.relations) {
+            for (let relation of this.relations) {
+                const relData = {};
+                // await db.query(deleteRelation({
+                //     table: item.constructor.table(),
+                //     foreignKey: item.constructor.fk,
+                //     id: this.id
+                // }));
+                for (let item of relation) {
+                    for (let field of item.fields) {
+                        if (field !== 'id') {
+                            relData[field] = item[field];
+                        }
+                        relData.user_id = this.id;
+                    }
+
+                    resultCar.push(await db.query(insertItem({
+                        table: item.constructor.table()
+                    }), relData))
+                }
             }
         }
       return [resultUser, resultCar];

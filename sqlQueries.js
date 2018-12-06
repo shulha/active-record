@@ -3,10 +3,6 @@ const queries = {
                             FROM {table} 
                             WHERE {pk} = {id}`,
 
-    findAllWithRelation :  `SELECT *
-                            FROM {table}, {model}
-                            WHERE {foreignKey} = {table}.{primaryKey}`,
-
     findAll :              `SELECT * 
                             FROM {table}`,
 
@@ -17,13 +13,24 @@ const queries = {
     insert :               `INSERT INTO {table} SET ?`,
 
     update :               `UPDATE {table} 
-                            SET {setString} 
-                            WHERE id = ?`, //todo в запросах захардкожен первичный ключ полем id
+                            SET ? 
+                            WHERE {pk} = {id}`,
 
     relation :             `SELECT *
                             FROM {table}
+                            WHERE {foreignKey} = {id}`,
+
+    deleteRelation :       `DELETE
+                            FROM {table}
                             WHERE {foreignKey} = {id}`
 };
+
+function deleteRelation({table, foreignKey, id}) {
+    return queries['deleteRelation']
+        .replace(/{table}/g, table)
+        .replace(/{foreignKey}/g, foreignKey)
+        .replace(/{id}/g, id);
+}
 
 function withRelation({table, foreignKey, id}) {
     return queries['relation']
@@ -51,15 +58,16 @@ function deleteItem({table, pk, id}) {
         .replace(/{id}/g, id);
 }
 
-function insertItem(obj) {
+function insertItem({table}) {
     return queries['insert']
-        .replace(/{table}/g, obj.table);
+        .replace(/{table}/g, table);
 }
 
-function updateItem(obj) {
+function updateItem({table, pk, id}) {
     return queries['update']
-        .replace(/{table}/g, obj.table)
-        .replace(/{setString}/g, obj.setString);
+        .replace(/{table}/g, table)
+        .replace(/{pk}/g, pk)
+        .replace(/{id}/g, id);
 }
 
 module.exports = {
@@ -67,5 +75,6 @@ module.exports = {
     withRelation,
     deleteItem,
     insertItem,
-    updateItem
+    updateItem,
+    deleteRelation
 };
