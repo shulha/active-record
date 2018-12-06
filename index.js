@@ -26,12 +26,12 @@ db.connect(function(err) {
 (async function() {
   try {
 // Открыть с БД и вывести в консоль существующего пользователя с машинами
-      const user2 = await User.load(2);
-      console.log(user2);
-      console.log( user2 instanceof User );
+//       const user2 = await User.load(2);
+//       console.log(user2);
+//       console.log( user2 instanceof User );
 
-      const users = await User.loadAll();
-      console.log(users);
+//       const users = await User.loadAll();
+//       console.log(users);
 
       // const car1 = await Car.load(1);
       // console.log(car1);
@@ -39,6 +39,10 @@ db.connect(function(err) {
       // const cars = await Car.loadAll();
       // console.log(cars);
 
+// Удалить пользователя
+      const user3 = await User.load(3);
+      const deletingResult = await user3.delete();
+      console.log(deletingResult);
 
 
   } catch (err) {
@@ -50,7 +54,5 @@ db.connect(function(err) {
 // Создать нового пользователя
 
 // Изменить имя пользователю
-
-// Удалить пользователя
 
 // Добавить пользователю новую машину

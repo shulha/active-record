@@ -12,7 +12,7 @@ const queries = {
 
     delete :               `DELETE 
                             FROM {table}
-                            WHERE id = {id}`, //todo в запросах захардкожен первичный ключ полем id
+                            WHERE {pk} = {id}`,
 
     insert :               `INSERT INTO {table} SET ?`,
 
@@ -44,10 +44,11 @@ function getQueryFind({table, pk, id}) {
         .replace(/{table}/g, table);
 }
 
-function deleteItem(obj) {
+function deleteItem({table, pk, id}) {
     return queries['delete']
-        .replace(/{table}/g, obj.table)
-        .replace(/{id}/g, obj.id);
+        .replace(/{table}/g, table)
+        .replace(/{pk}/g, pk)
+        .replace(/{id}/g, id);
 }
 
 function insertItem(obj) {

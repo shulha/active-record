@@ -54,14 +54,12 @@ class Model {
         return await this.find()
     }
 
-    async delete(id) {
-        if (!Number.isInteger(Number(id))) {
-            throw new Error('Invalid id');
-        }
-
+    async delete()
+    {
         return (await db.query(deleteItem({
             table: this.constructor.table(),
-            id
+            id: this.id,
+            pk: this.pk
         })));
     }
 
