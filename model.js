@@ -20,29 +20,33 @@ class Model {
         const relations = this.hasMany;
         for (let item of queryResult) {
             let classObject = new this;
-            for (let field of classObject.fields) {
+            classObject.fields.map(field => {
                 classObject[field] = item[field];
-            }
+            });
             if (relations) {
-                let relArr = [];
-                for (let i = 0; i < relations.length; i++) {
-                    const tableName = (relations[i]['model']).table();
-                    const foreignKey = relations[i]['foreignKey'];
-
-                    const cars = await db.query(withRelation({
-                                    table: tableName,
-                                    foreignKey,
-                                    id: item.id
-                                }));
-                    relArr[tableName] = JSON.parse(JSON.stringify(cars));
-                }
-                classObject.relations = relArr;
+                await this.addRelations(relations, item, classObject);
             }
 
             arrayResult.push(classObject);
         }
 
         return arrayResult;
+    }
+
+    static async addRelations(relations, item, classObject) {
+        let relArr = [];
+        for (let i = 0; i < relations.length; i++) {
+            const tableName = (relations[i]['model']).table();
+            const foreignKey = relations[i]['foreignKey'];
+
+            const cars = await db.query(withRelation({
+                table: tableName,
+                foreignKey,
+                id: item.id
+            }));
+            relArr[tableName] = JSON.parse(JSON.stringify(cars));
+        }
+        classObject.relations = relArr;
     }
 
     static async load(id)
@@ -57,11 +61,11 @@ class Model {
 
     async delete()
     {
-        return (await db.query(deleteItem({
+         await db.query(deleteItem({
             table: this.constructor.table(),
             id: this.id,
             pk: this.pk
-        })));
+        }));
     }
 
     async save() {
