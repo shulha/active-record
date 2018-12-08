@@ -36,7 +36,8 @@ class Model {
     static async addRelations(relations, item, classObject) {
         let relArr = [];
         for (let i = 0; i < relations.length; i++) {
-            const tableName = (relations[i]['model']).table();
+            const model = relations[i]['model'];
+            const tableName = model.table();
             const foreignKey = relations[i]['foreignKey'];
 
             const cars = await db.query(withRelation({
@@ -44,14 +45,28 @@ class Model {
                 foreignKey,
                 id: item.id
             }));
-            relArr[tableName] = JSON.parse(JSON.stringify(cars));
+            const carResults = [];
+
+            for (let car of cars) {
+                const relObject = new model;
+                relObject.fields.map(field => {
+                    relObject[field] = car[field];
+                });
+
+                carResults.push(relObject);
+            }
+            relArr[tableName] = carResults;
         }
         classObject.relations = relArr;
     }
 
     static async load(id)
     {
-        return (await this.find(id)).shift()
+        if (id && Number.isInteger(Number(id))) {
+            return (await this.find(id)).shift()
+        }
+
+        throw new Error('Invalid id');
     }
 
     static async loadAll()
@@ -74,7 +89,7 @@ class Model {
         const data  = {};
 
         for (let field of this.fields) {
-            if (field !== 'id') {
+            if (field !== this.pk) {
                 data[field] = this[field];
             }
         }
@@ -102,7 +117,7 @@ class Model {
                 // }));
                 for (let item of relation) {
                     for (let field of item.fields) {
-                        if (field !== 'id') {
+                        if (field !== item.pk) {
                             relData[field] = item[field];
                         }
                         relData.user_id = this.id;
