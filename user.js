@@ -9,7 +9,6 @@ class User extends Model {
   constructor() {
     super();
 
-    this.pk = 'id';
     this.fields = ['id', 'first_name', 'last_name', 'age', 'gender'];
     this.hasMany = [
       {

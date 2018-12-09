@@ -2,8 +2,7 @@ const { getQueryFind,
         withRelation,
         deleteItem,
         insertItem,
-        updateItem,
-        deleteRelation } = require('./sqlQueries');
+        updateItem } = require('./sqlQueries');
 
 class Model {
 
@@ -79,7 +78,7 @@ class Model {
          await db.query(deleteItem({
             table: this.constructor.table(),
             id: this.id,
-            pk: this.pk
+            pk: this.constructor.pk
         }));
     }
 
@@ -89,7 +88,7 @@ class Model {
         const data  = {};
 
         for (let field of this.fields) {
-            if (field !== this.pk) {
+            if (field !== this.constructor.pk) {
                 data[field] = this[field];
             }
         }
@@ -102,7 +101,7 @@ class Model {
         } else {
             resultUser = await db.query(updateItem({
                 table,
-                pk: this.pk,
+                pk: this.constructor.pk,
                 id
             }), data);
         }
@@ -110,11 +109,6 @@ class Model {
         if (this.relations) {
             for (let relation of this.relations) {
                 const relData = {};
-                // await db.query(deleteRelation({
-                //     table: item.constructor.table(),
-                //     foreignKey: item.constructor.fk,
-                //     id: this.id
-                // }));
                 for (let item of relation) {
                     for (let field of item.fields) {
                         if (field !== item.pk) {

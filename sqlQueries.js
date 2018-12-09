@@ -19,18 +19,7 @@ const queries = {
     relation :             `SELECT *
                             FROM {table}
                             WHERE {foreignKey} = {id}`,
-
-    deleteRelation :       `DELETE
-                            FROM {table}
-                            WHERE {foreignKey} = {id}`
 };
-
-function deleteRelation({table, foreignKey, id}) {
-    return queries['deleteRelation']
-        .replace(/{table}/g, table)
-        .replace(/{foreignKey}/g, foreignKey)
-        .replace(/{id}/g, id);
-}
 
 function withRelation({table, foreignKey, id}) {
     return queries['relation']
@@ -75,6 +64,5 @@ module.exports = {
     withRelation,
     deleteItem,
     insertItem,
-    updateItem,
-    deleteRelation
+    updateItem
 };
