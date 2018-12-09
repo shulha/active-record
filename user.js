@@ -7,7 +7,8 @@ class User extends Model {
   }
 
   constructor() {
-    this.pk = 'id';
+    super();
+
     this.fields = ['id', 'first_name', 'last_name', 'age', 'gender'];
     this.hasMany = [
       {
@@ -17,8 +18,16 @@ class User extends Model {
       }
     ];
 
-    super();
   }
 }
+
+User.pk ='id' ;
+User.hasMany = [
+  {
+    model: Car,
+    primaryKey: 'id',
+    foreignKey: 'user_id'
+  }
+];
 
 module.exports = User;
